@@ -10,6 +10,8 @@
 #include <SDL/SDL.h>
 #include <SDL_opengles2.h>
 
+static SDL_Window *window = NULL;
+
 // Shader sources
 const GLchar* vertexSource =
     "attribute vec4 position;                      \n"
@@ -30,8 +32,22 @@ const GLchar* fragmentSource =
     "}                                            \n";
 
 
-std::function<void()> loop;
-void main_loop() { loop(); }
+void main_loop() { 
+        SDL_Event e;
+        while(SDL_PollEvent(&e))
+        {
+            if(e.type == SDL_QUIT) std::terminate();
+        }
+
+        // Clear the screen to black
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        // Draw a triangle from the 3 vertices
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        SDL_GL_SwapWindow(window);
+}
 
 int main(int argc, char** argv)
 {
@@ -40,16 +56,16 @@ int main(int argc, char** argv)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    auto wnd(
+    window = (
         SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN));
 
-    auto glc = SDL_GL_CreateContext(wnd);
+    auto glc = SDL_GL_CreateContext(window);
 
     SDL_GL_SetSwapInterval(0);
 
     auto rdr = SDL_CreateRenderer(
-        wnd, -1, SDL_RENDERER_ACCELERATED);
+        window, -1, SDL_RENDERER_ACCELERATED);
 
     // Create Vertex Array Object
     GLuint vao;
@@ -87,29 +103,7 @@ int main(int argc, char** argv)
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-    loop = [&]
-    {
-        SDL_Event e;
-        while(SDL_PollEvent(&e))
-        {
-            if(e.type == SDL_QUIT) std::terminate();
-        }
-
-        // Clear the screen to black
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // Draw a triangle from the 3 vertices
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        SDL_GL_SwapWindow(wnd);
-    };
-
-#ifdef __EMSCRIPTEN__
-    emscripten_set_main_loop(main_loop, 0, true);
-#else
-    while(true) main_loop();
-#endif
+    emscripten_set_main_loop(main_loop, 0, 1);
 
     return 0;
 }
