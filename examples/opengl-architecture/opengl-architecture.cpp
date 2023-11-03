@@ -33,7 +33,7 @@ const GLchar* fragmentSource =
     "    gl_FragColor = vec4 ( color, 1.0 );      \n"
     "}                                            \n";
 
-
+// Global state for renderer
 typedef struct render_params {
   int color;
 } render_params;

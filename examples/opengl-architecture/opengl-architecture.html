@@ -1752,6 +1752,7 @@
 
     <script type="text/javascript">
       var Module = {};
+      let color = 0;
 
       Module["canvas"] = (() => {
         var canvas = document.getElementById("canvas");
@@ -1773,6 +1774,7 @@
       Module["onRuntimeInitialized"] = function () {
         console.log("wasm loaded ");
 
+        // Grab each C++ function from the WASM bundle
         const init_gl = Module.cwrap(
           "init_gl", // name of C function
           "", // return type
@@ -1793,16 +1795,22 @@
         console.log("cwrap", render_gl);
         console.log("cwrap", change_color);
 
+        // Initialize SDL "window" (aka canvas) and OpenGL context
         init_gl();
+        // Debug: Changes color immediately
         change_color(1);
-        render_gl(0);
 
-        let color = 0;
-        setInterval(() => {
+        // Alternate the color in the internal C++ struct
+        // which is used by the clear color in the render method below
+        // This is a way to communicate back to C++ from JS and store state.
+        window.setInterval(() => {
+          color = color === 0 ? 1 : 0;
           console.log("changing color", color);
-          // color = color === 0 ? 1 : 0;
-          // change_color(color);
-        }, 400);
+          change_color(color);
+        }, 1000);
+
+        // Run the OpenGL render process (clear -> draw)
+        render_gl();
       };
     </script>
     <script async type="text/javascript" src="opengl-architecture.js"></script>
