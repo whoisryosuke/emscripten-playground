@@ -1,16 +1,20 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import CustomRenderer from "./renderer/renderer";
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+// const root = ReactDOM.createRoot(
+//   document.getElementById('root') as HTMLElement
+// );
+const rootElement = document.getElementById("root");
+CustomRenderer.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
+  rootElement,
+  () => console.log("Rendering UI or something")
 );
 
 // If you want to start measuring performance in your app, pass a function
