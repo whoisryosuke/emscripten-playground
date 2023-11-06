@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Emscripten + React App</title>
+
+    <script
+      src="https://unpkg.com/react@18/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <canvas
+      class="emscripten"
+      id="canvas"
+      oncontextmenu="event.preventDefault()"
+      tabindex="-1"
+    ></canvas>
+
+    <div id="mydiv"></div>
+
+    <script type="text/babel">
+      function Hello() {
+        return <h1>Hello component rendering</h1>;
+      }
+
+      const container = document.getElementById("mydiv");
+      const root = ReactDOM.createRoot(container);
+      root.render(<Hello />);
+    </script>
+
+    <script type="text/javascript">
+      var Module = {};
+      let color = 0;
+
+      Module["canvas"] = (() => {
+        var canvas = document.getElementById("canvas");
+
+        // As a default initial behavior, pop up an alert when webgl context is lost. To make your
+        // application robust, you may want to override this behavior before shipping!
+        // See http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.15.2
+        canvas.addEventListener(
+          "webglcontextlost",
+          (e) => {
+            alert("WebGL context lost. You will need to reload the page.");
+            e.preventDefault();
+          },
+          false
+        );
+
+        return canvas;
+      })();
+      Module["onRuntimeInitialized"] = function () {
+        console.log("wasm loaded ");
+
+        // Grab each C++ function from the WASM bundle
+        const init_gl = Module.cwrap(
+          "init_gl", // name of C function
+          "", // return type
+          [] // argument types
+        );
+        const render_gl = Module.cwrap(
+          "render_gl", // name of C function
+          "", // return type
+          [""] // argument types
+        );
+        const change_color = Module.cwrap(
+          "change_color", // name of C function
+          "", // return type
+          ["int"] // argument types
+        );
+
+        console.log("cwrap", init_gl);
+        console.log("cwrap", render_gl);
+        console.log("cwrap", change_color);
+
+        // Initialize SDL "window" (aka canvas) and OpenGL context
+        init_gl();
+        // Debug: Changes color immediately
+        change_color(1);
+
+        // Alternate the color in the internal C++ struct
+        // which is used by the clear color in the render method below
+        // This is a way to communicate back to C++ from JS and store state.
+        window.setInterval(() => {
+          color = color === 0 ? 1 : 0;
+          console.log("changing color", color);
+          change_color(color);
+        }, 1000);
+
+        // Run the OpenGL render process (clear -> draw)
+        render_gl();
+      };
+    </script>
+    <script async type="text/javascript" src="opengl-architecture.js"></script>
+  </body>
+</html>
