@@ -9811,7 +9811,7 @@ var wasmImports = {
   /** @export */
   glCreateShader: _glCreateShader,
   /** @export */
-  glDrawElements: _glDrawElements,
+  glDrawArrays: _glDrawArrays,
   /** @export */
   glEnableVertexAttribArray: _glEnableVertexAttribArray,
   /** @export */

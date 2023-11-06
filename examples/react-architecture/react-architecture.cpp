@@ -34,8 +34,31 @@ const GLchar* fragmentSource =
     "}                                            \n";
 
 
-static std::vector<unsigned int> indices{0, 1, 2};
-static GLuint index_buffer;
+// static std::vector<unsigned int> indices{0, 1, 2};
+// static GLuint index_buffer;
+
+// UI Elements
+// Ideally here we'd defer to a higher level library
+typedef struct UIElement {
+    GLuint vbo;
+} UIElement;
+static std::vector<UIElement> ui_elements;
+
+UIElement create_ui_element() {
+    UIElement ui_element;
+    // Create a Vertex Buffer Object and copy the vertex data to it
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    ui_element.vbo = vbo;
+
+    // Vertices
+    GLfloat vertices[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    return ui_element;
+}
 
 // Global state for renderer
 typedef struct render_params {
@@ -60,12 +83,18 @@ static render_params global_params = {};
             }
             glClear(GL_COLOR_BUFFER_BIT);
 
+            // Draw UI elements
+            for (auto & element : ui_elements) {
+                glBindBuffer(GL_ARRAY_BUFFER, element.vbo);
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+            }
             
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+            
+
+            // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
 
             // Draw a triangle from the 3 vertices
-            // glDrawArrays(GL_TRIANGLES, 0, 3);
-            glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
+            // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
 
             SDL_GL_SwapWindow(window);
     }
@@ -93,20 +122,14 @@ static render_params global_params = {};
         glGenVertexArraysOES(1, &vao);
         glBindVertexArrayOES(vao);
 
-        // Create a Vertex Buffer Object and copy the vertex data to it
-        GLuint vbo;
-        glGenBuffers(1, &vbo);
-
-        // Vertices
-        GLfloat vertices[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // Create a "UI Element" (aka triangle)
+        UIElement ui_element = create_ui_element();
+        ui_elements.push_back(ui_element);
 
         // Index
-        glGenBuffers(1, &index_buffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+        // glGenBuffers(1, &index_buffer);
+        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+        // glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
         // Create and compile the vertex shader
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
