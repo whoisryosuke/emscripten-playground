@@ -8,6 +8,7 @@
 #include <emscripten.h>
 #include <SDL/SDL.h>
 #include <SDL_opengles2.h>
+#include "glm.hpp"
 
 extern "C" {
     
@@ -138,6 +139,21 @@ static render_params global_params = {};
 
         add_ui(1);
         add_ui(5);
+
+        glm::vec2 translations[100];
+        int index = 0;
+        float offset = 0.1f;
+        for(int y = -10; y < 10; y += 2)
+        {
+            for(int x = -10; x < 10; x += 2)
+            {
+                glm::vec2 translation;
+                translation.x = (float)x / 10.0f + offset;
+                translation.y = (float)y / 10.0f + offset;
+                translations[index++] = translation;
+            }
+        }  
+        printf("generated instances %.6f \n", translations[0].x);
 
         // Index
         // glGenBuffers(1, &index_buffer);
