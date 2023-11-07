@@ -1,11 +1,10 @@
-// emcc -o react-architecture.html react-architecture.cpp -s USE_SDL=2 -s FULL_ES2=1 -s -sEXPORTED_FUNCTIONS="_render_gl,_init_gl,_change_color" -sEXPORTED_RUNTIME_METHODS="ccall,cwrap"
+// emcc -o react-architecture.html react-architecture.cpp -s USE_SDL=2 -s FULL_ES2=1 -s -sEXPORTED_FUNCTIONS="_render_gl,_init_gl,_change_color,_add_ui" -sEXPORTED_RUNTIME_METHODS="ccall,cwrap"
 // emcc -o react-architecture-asyncify.html react-architecture.cpp -s USE_SDL=2 -s FULL_ES2=1 -s ASYNCIFY=1 -s SINGLE_FILE=1
 
 #include <exception>
 #include <functional>
 
 #define GL_GLEXT_PROTOTYPES 1
-
 #include <emscripten.h>
 #include <SDL/SDL.h>
 #include <SDL_opengles2.h>
@@ -41,21 +40,33 @@ const GLchar* fragmentSource =
 // Ideally here we'd defer to a higher level library
 typedef struct UIElement {
     GLuint vbo;
+    GLuint vao;
 } UIElement;
 static std::vector<UIElement> ui_elements;
 
-UIElement create_ui_element() {
+UIElement create_ui_element(int offset) {
     UIElement ui_element;
+    // Create Vertex Array Object
+    // GLuint vao;
+    glGenVertexArraysOES(1, &ui_element.vao);
+    glBindVertexArrayOES(ui_element.vao);
+    // ui_element.vao = vao;
+
     // Create a Vertex Buffer Object and copy the vertex data to it
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    ui_element.vbo = vbo;
+    // GLuint vbo;
+    glGenBuffers(1, &ui_element.vbo);
+    // ui_element.vbo = vbo;
 
     // Vertices
-    GLfloat vertices[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
+    float vertex_offset = offset * 0.1f;
+    float top_left_x = vertex_offset * 0.1f + 0.5f;
+    // GLfloat vertices[] = {0.0f, 0.5f, 0.5f, -0.5f, -0.5f, -0.5f};
+    GLfloat vertices[] = {vertex_offset, top_left_x, top_left_x, -top_left_x, -top_left_x, -top_left_x};
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, ui_element.vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    printf("Creating UI element \n");
 
     return ui_element;
 }
@@ -85,18 +96,26 @@ static render_params global_params = {};
 
             // Draw UI elements
             for (auto & element : ui_elements) {
+                printf("Rendering UI element %d \n", element.vao);
+                glBindVertexArrayOES(element.vao);
                 glBindBuffer(GL_ARRAY_BUFFER, element.vbo);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
             }
             
-            
-
             // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
 
             // Draw a triangle from the 3 vertices
             // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
 
             SDL_GL_SwapWindow(window);
+    }
+
+    
+    void add_ui(int offset)
+    {
+        // Create a "UI Element" (aka triangle)
+        UIElement ui_element = create_ui_element(offset);
+        ui_elements.push_back(ui_element);
     }
 
     void init_gl() {
@@ -117,14 +136,8 @@ static render_params global_params = {};
         auto rdr = SDL_CreateRenderer(
             window, -1, SDL_RENDERER_ACCELERATED);
 
-        // Create Vertex Array Object
-        GLuint vao;
-        glGenVertexArraysOES(1, &vao);
-        glBindVertexArrayOES(vao);
-
-        // Create a "UI Element" (aka triangle)
-        UIElement ui_element = create_ui_element();
-        ui_elements.push_back(ui_element);
+        add_ui(1);
+        add_ui(5);
 
         // Index
         // glGenBuffers(1, &index_buffer);

@@ -1790,6 +1790,11 @@
           "", // return type
           ["int"] // argument types
         );
+        const add_ui = Module.cwrap(
+          "add_ui", // name of C function
+          "", // return type
+          ["int"] // argument types
+        );
 
         console.log("cwrap", init_gl);
         console.log("cwrap", render_gl);
@@ -1797,6 +1802,10 @@
 
         // Initialize SDL "window" (aka canvas) and OpenGL context
         init_gl();
+
+        // Add UI
+        // add_ui(5);
+
         // Debug: Changes color immediately
         change_color(1);
 
