@@ -18,9 +18,10 @@ static SDL_Window *window = NULL;
 const GLchar* vertexSource =
     "attribute vec4 position;                      \n"
     "varying vec3 color;                           \n"
+    "attribute vec2 aOffset;                           \n"
     "void main()                                   \n"
     "{                                             \n"
-    "    gl_Position = vec4(position.xyz, 1.0);    \n"
+    "    gl_Position = vec4(position.xyz + aOffset, 1.0);    \n"
     "    color = gl_Position.xyz + vec3(0.5);      \n"
     "}                                             \n";
 
@@ -96,17 +97,21 @@ static render_params global_params = {};
             glClear(GL_COLOR_BUFFER_BIT);
 
             // Draw UI elements
-            for (auto & element : ui_elements) {
-                printf("Rendering UI element %d \n", element.vao);
-                glBindVertexArrayOES(element.vao);
-                glBindBuffer(GL_ARRAY_BUFFER, element.vbo);
-                glDrawArrays(GL_TRIANGLES, 0, 3);
-            }
+            // for (auto & element : ui_elements) {
+            //     printf("Rendering UI element %d \n", element.vao);
+            //     glBindVertexArrayOES(element.vao);
+            //     glBindBuffer(GL_ARRAY_BUFFER, element.vbo);
+            //     glDrawArrays(GL_TRIANGLES, 0, 3);
+            // }
             
             // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
 
             // Draw a triangle from the 3 vertices
             // glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, (void*)0);
+
+            // Instanced drawing
+            glDrawArraysInstancedNV(GL_TRIANGLES, 0, 3, 100);
+
 
             SDL_GL_SwapWindow(window);
     }
@@ -137,7 +142,6 @@ static render_params global_params = {};
         auto rdr = SDL_CreateRenderer(
             window, -1, SDL_RENDERER_ACCELERATED);
 
-        add_ui(1);
         add_ui(5);
 
         glm::vec2 translations[100];
@@ -154,6 +158,17 @@ static render_params global_params = {};
             }
         }  
         printf("generated instances %.6f \n", translations[0].x);
+
+        unsigned int instanceVBO;
+        glGenBuffers(1, &instanceVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * 100, &translations[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0); 
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);	
+        glVertexAttribDivisorNV(2, 1);  
 
         // Index
         // glGenBuffers(1, &index_buffer);
