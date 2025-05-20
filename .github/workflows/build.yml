@@ -14,11 +14,10 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          cache-dependency-path: docs/yarn.lock
           node-version: 18
-          cache: yarn
+          cache: npm
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm install
       - uses: mymindstorm/setup-emsdk@v14
 
       - name: Verify
