@@ -207,6 +207,8 @@ const renderer = {
   init: async () => {
     // Init WASM
     wasmModule = await loadWASM();
+
+    // wasmModule.init_gl()
   },
   render: (reactElement: any, domElement: any, callback: any) => {
     // Create a root Container if it doesnt exist
