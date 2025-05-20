@@ -3,12 +3,26 @@ import ReactReconciler from "react-reconciler";
 const rootHostContext = {};
 const childHostContext = {};
 
-const hostConfig = {
-  now: Date.now,
+const hostConfig: ReactReconciler.HostConfig<
+  string,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any
+> = {
+  // now: Date.now,
   getRootHostContext: () => {
     return rootHostContext;
   },
-  prepareForCommit: () => {},
+  prepareForCommit: () => null,
   resetAfterCommit: () => {},
   clearContainer: () => {},
   getChildHostContext: () => {
@@ -23,17 +37,19 @@ const hostConfig = {
    This is where react-reconciler wants to create an instance of UI element in terms of the target. Since our target here is the DOM, we will create document.createElement and type is the argument that contains the type string like div or img or h1 etc. The initial values of domElement attributes can be set in this function from the newProps argument
    */
   createInstance: (
-    type,
-    newProps,
-    rootContainerInstance,
-    _currentHostContext,
-    workInProgress
+    type: string,
+    newProps: any,
+    rootContainerInstance: any,
+    _currentHostContext: any,
+    workInProgress: any
   ) => {
+    console.log("Creating instance", type);
     const domElement = document.createElement(type);
     Object.keys(newProps).forEach((propName) => {
       const propValue = newProps[propName];
       if (propName === "children") {
         if (typeof propValue === "string" || typeof propValue === "number") {
+          // @ts-ignore
           domElement.textContent = propValue;
         }
       } else if (propName === "onClick") {
@@ -47,24 +63,30 @@ const hostConfig = {
     });
     return domElement;
   },
-  createTextInstance: (text) => {
+  createTextInstance: (text: string) => {
     return document.createTextNode(text);
   },
-  appendInitialChild: (parent, child) => {
+  appendInitialChild: (parent: any, child: any) => {
     parent.appendChild(child);
   },
-  appendChild(parent, child) {
+  appendChild(parent: any, child: any) {
     parent.appendChild(child);
   },
-  finalizeInitialChildren: (domElement, type, props) => {},
+  finalizeInitialChildren: (domElement: any, type: string, props: any) => true,
   supportsMutation: true,
-  appendChildToContainer: (parent, child) => {
+  appendChildToContainer: (parent: any, child: any) => {
     parent.appendChild(child);
   },
-  prepareUpdate(domElement, oldProps, newProps) {
+  prepareUpdate(domElement: any, oldProps: any, newProps: any) {
     return true;
   },
-  commitUpdate(domElement, updatePayload, type, oldProps, newProps) {
+  commitUpdate(
+    domElement: any,
+    updatePayload: any,
+    type: string,
+    oldProps: any,
+    newProps: any
+  ) {
     Object.keys(newProps).forEach((propName) => {
       const propValue = newProps[propName];
       if (propName === "children") {
@@ -77,19 +99,63 @@ const hostConfig = {
       }
     });
   },
-  commitTextUpdate(textInstance, oldText, newText) {
+  commitMount: () => {},
+  commitTextUpdate(textInstance: any, oldText: string, newText: string) {
     textInstance.text = newText;
   },
-  removeChild(parentInstance, child) {
+  removeChild(parentInstance: any, child: any) {
     parentInstance.removeChild(child);
   },
+  supportsPersistence: false,
+  getPublicInstance: function (instance: any) {
+    throw new Error("Function not implemented.");
+  },
+  preparePortalMount: function (containerInfo: any): void {
+    throw new Error("Function not implemented.");
+  },
+  scheduleTimeout: function (
+    fn: (...args: unknown[]) => unknown,
+    delay?: number
+  ) {
+    throw new Error("Function not implemented.");
+  },
+  cancelTimeout: function (id: any): void {
+    throw new Error("Function not implemented.");
+  },
+  noTimeout: undefined,
+  isPrimaryRenderer: false,
+  getCurrentEventPriority: function (): ReactReconciler.Lane {
+    throw new Error("Function not implemented.");
+  },
+  getInstanceFromNode: function (
+    node: any
+  ): ReactReconciler.Fiber | null | undefined {
+    throw new Error("Function not implemented.");
+  },
+  beforeActiveInstanceBlur: function (): void {
+    throw new Error("Function not implemented.");
+  },
+  afterActiveInstanceBlur: function (): void {
+    throw new Error("Function not implemented.");
+  },
+  prepareScopeUpdate: function (scopeInstance: any, instance: any): void {
+    throw new Error("Function not implemented.");
+  },
+  getInstanceFromScope: function (scopeInstance: any) {
+    throw new Error("Function not implemented.");
+  },
+  detachDeletedInstance: function (node: any): void {
+    throw new Error("Function not implemented.");
+  },
+  supportsHydration: false,
 };
 const ReactReconcilerInst = ReactReconciler(hostConfig);
 
 const renderer = {
-  render: (reactElement, domElement, callback) => {
+  render: (reactElement: any, domElement: any, callback: any) => {
     // Create a root Container if it doesnt exist
     if (!domElement._rootContainer) {
+      // @ts-ignore
       domElement._rootContainer = ReactReconcilerInst.createContainer(
         domElement,
         false
