@@ -1,0 +1,31 @@
+name: "build-emscriptem"
+on: [push]
+
+defaults:
+  run:
+    working-directory: ./examples/react-architecture
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          cache-dependency-path: docs/yarn.lock
+          node-version: 18
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - uses: mymindstorm/setup-emsdk@v14
+
+      - name: Verify
+        run: emcc -v
+
+      - name: Build
+        run: emcc react-architecture.cpp -o react-architecture-es6.js --emit-tsd react-architecture-es6.d.ts -s USE_SDL=2 -s FULL_ES2=1 -s MODULARIZE -s SINGLE_FILE=1 -O2 -lembind -s EXPORT_ES6=1 -s NO_EXIT_RUNTIME=1 -s ALLOW_MEMORY_GROWTH=1 -s -sEXPORTED_FUNCTIONS="_render_gl,_init_gl,_change_color,_add_ui" -s EXPORT_NAME="render_module"
+
+      - name: Save Changes
+        uses: EndBug/add-and-commit@v9

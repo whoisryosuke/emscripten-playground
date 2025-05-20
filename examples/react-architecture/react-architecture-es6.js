@@ -1,4 +1,4 @@
-var Module = (() => {
+var render_module = (() => {
   
   return (
 async function(moduleArg = {}) {
@@ -11,4 +11,4 @@ var Module=moduleArg;var readyPromiseResolve,readyPromiseReject;var readyPromise
 }
 );
 })();
-export default Module;
+export default render_module;
