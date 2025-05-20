@@ -1,4 +1,4 @@
-import ReactReconciler from "react-reconciler";
+import ReactReconciler, { type EventPriority } from "react-reconciler";
 import { loadWASM } from "../integrations/wasm-module";
 
 // Init WASM
@@ -9,6 +9,7 @@ const childHostContext = {};
 
 const hostConfig: ReactReconciler.HostConfig<
   string,
+  any,
   any,
   any,
   any,
@@ -82,9 +83,6 @@ const hostConfig: ReactReconciler.HostConfig<
   appendChildToContainer: (parent: any, child: any) => {
     parent.appendChild(child);
   },
-  prepareUpdate(domElement: any, oldProps: any, newProps: any) {
-    return true;
-  },
   commitUpdate(
     domElement: any,
     updatePayload: any,
@@ -113,50 +111,94 @@ const hostConfig: ReactReconciler.HostConfig<
   },
   supportsPersistence: false,
   getPublicInstance: function (instance: any) {
-    throw new Error("Function not implemented.");
+    throw new Error("getPublicInstance Function not implemented.");
   },
   preparePortalMount: function (containerInfo: any): void {
-    throw new Error("Function not implemented.");
+    throw new Error("preparePortalMount Function not implemented.");
   },
   scheduleTimeout: function (
     fn: (...args: unknown[]) => unknown,
     delay?: number
   ) {
-    throw new Error("Function not implemented.");
+    throw new Error("scheduleTimeout Function not implemented.");
   },
   cancelTimeout: function (id: any): void {
-    throw new Error("Function not implemented.");
+    throw new Error("cancelTimeout Function not implemented.");
   },
   noTimeout: undefined,
   isPrimaryRenderer: false,
-  getCurrentEventPriority: function (): ReactReconciler.Lane {
-    throw new Error("Function not implemented.");
+  getCurrentUpdatePriority: function (): ReactReconciler.Lane {
+    throw new Error("getCurrentUpdatePriority Function not implemented.");
   },
   getInstanceFromNode: function (
     node: any
   ): ReactReconciler.Fiber | null | undefined {
-    throw new Error("Function not implemented.");
+    throw new Error("getInstanceFromNode Function not implemented.");
   },
   beforeActiveInstanceBlur: function (): void {
-    throw new Error("Function not implemented.");
+    throw new Error("beforeActiveInstanceBlur Function not implemented.");
   },
   afterActiveInstanceBlur: function (): void {
-    throw new Error("Function not implemented.");
+    throw new Error("afterActiveInstanceBlur Function not implemented.");
   },
   prepareScopeUpdate: function (scopeInstance: any, instance: any): void {
-    throw new Error("Function not implemented.");
+    throw new Error("prepareScopeUpdate Function not implemented.");
   },
   getInstanceFromScope: function (scopeInstance: any) {
-    throw new Error("Function not implemented.");
+    throw new Error("getInstanceFromScope Function not implemented.");
   },
   detachDeletedInstance: function (node: any): void {
-    throw new Error("Function not implemented.");
-  },
-  //@ts-ignore
-  resolveUpdatePriority: function (): void {
-    throw new Error("Function not implemented.");
+    throw new Error("detachDeletedInstance Function not implemented.");
   },
   supportsHydration: false,
+  NotPendingTransition: undefined,
+  HostTransitionContext: undefined,
+  setCurrentUpdatePriority: function (
+    newPriority: ReactReconciler.EventPriority
+  ): void {
+    throw new Error("setCurrentUpdatePriority Function not implemented.");
+  },
+  resolveUpdatePriority: function (): ReactReconciler.EventPriority {
+    console.log("resolveUpdatePriority Function not implemented.");
+    return 0;
+  },
+  resetFormInstance: function (form: any): void {
+    throw new Error("resetFormInstance Function not implemented.");
+  },
+  requestPostPaintCallback: function (callback: (time: number) => void): void {
+    throw new Error("requestPostPaintCallback Function not implemented.");
+  },
+  shouldAttemptEagerTransition: function (): boolean {
+    throw new Error("shouldAttemptEagerTransition Function not implemented.");
+  },
+  trackSchedulerEvent: function (): void {
+    throw new Error("trackSchedulerEvent Function not implemented.");
+  },
+  resolveEventType: function (): null | string {
+    throw new Error("resolveEventType Function not implemented.");
+  },
+  resolveEventTimeStamp: function (): number {
+    throw new Error("resolveEventTimeStamp Function not implemented.");
+  },
+  maySuspendCommit: function (type: string, props: any): boolean {
+    throw new Error("maySuspendCommit Function not implemented.");
+  },
+  preloadInstance: function (type: string, props: any): boolean {
+    throw new Error("preloadInstance Function not implemented.");
+  },
+  startSuspendingCommit: function (): void {
+    throw new Error("startSuspendingCommit Function not implemented.");
+  },
+  suspendInstance: function (type: string, props: any): void {
+    throw new Error("suspendInstance Function not implemented.");
+  },
+  waitForCommitToBeReady: function ():
+    | ((
+        initiateCommit: (...args: unknown[]) => unknown
+      ) => (...args: unknown[]) => unknown)
+    | null {
+    throw new Error("waitForCommitToBeReady Function not implemented.");
+  },
 };
 // Init React reconciler
 const ReactReconcilerInst = ReactReconciler(hostConfig);
